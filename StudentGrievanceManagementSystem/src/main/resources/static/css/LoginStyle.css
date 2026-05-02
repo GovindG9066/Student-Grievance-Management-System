@@ -1,0 +1,110 @@
+/* SAME CSS AS REGISTER (copy-paste kar sakta hai) */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial;
+}
+
+body {
+    height: 100vh;
+    background: linear-gradient(to right, #dbeafe, #e9d5ff);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+.container {
+    width: 800px;
+    height: 500px;
+    background: white;
+    display: flex;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+
+    animation: slideUp 0.6s ease;
+}
+
+.left {
+    width: 50%;
+    background: #f9fafb;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.left img {
+    width: 250px;
+    transition: 0.5s;
+}
+
+.left img:hover {
+    transform: scale(1.1);
+}
+
+.right {
+    width: 50%;
+    padding: 40px;
+}
+
+.right h2 {
+    margin-bottom: 20px;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.error-msg {
+    color: red;
+    background: #fee2e2;
+    padding: 8px;
+    border-radius: 6px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: #6366f1;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #4f46e5;
+}
+
+p {
+    margin-top: 15px;
+}
+
+a {
+    color: #6366f1;
+    text-decoration: none;
+}
+
+/* animation */
+@keyframes slideUp {
+    from {
+        transform: translateY(40px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+

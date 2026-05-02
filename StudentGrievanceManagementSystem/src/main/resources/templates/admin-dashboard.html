@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - SGMS</title>
+
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+
+<body>
+
+<!-- 🔥 NAVBAR -->
+<nav class="navbar">
+    <h2>⚙️ Admin Panel</h2>
+
+    <div class="nav-right">
+        <span>Welcome Admin 👋</span>
+        <a href="/logout"><button>Logout</button></a>
+    </div>
+</nav>
+
+<!-- 🔥 MAIN CONTAINER -->
+<div class="container">
+
+    <!-- 🔥 STATS CARDS -->
+    <div class="cards">
+        <div class="card">
+            <h3 th:text="${#lists.size(complaints)}">0</h3>
+            <p>Total Complaints</p>
+        </div>
+
+        <div class="card pending">
+            <h3 th:text="${#lists.size(complaints.?[status=='PENDING'])}">0</h3>
+            <p>Pending</p>
+        </div>
+
+        <div class="card progress">
+            <h3 th:text="${#lists.size(complaints.?[status=='IN_PROGRESS'])}">0</h3>
+            <p>In Progress</p>
+        </div>
+
+        <div class="card resolved">
+            <h3 th:text="${#lists.size(complaints.?[status=='APPROVED'])}">0</h3>
+            <p>Resolved</p>
+        </div>
+    </div>
+
+    <!-- 🔥 TABLE -->
+    <div class="table-section">
+
+        <h3>All Complaints</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>User</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <!-- 🔥 DYNAMIC DATA -->
+            <tbody>
+                <tr th:each="c, i : ${complaints}">
+                    <td th:text="${i.index + 1}"></td>
+                    <td th:text="${c.title}"></td>
+                    <td th:text="${c.type}"></td>
+                    <td th:text="${c.user.name}"></td>
+
+                    <!-- STATUS COLOR -->
+                    <td>
+                        <span th:if="${c.status == 'PENDING'}" style="color:orange;">Pending</span>
+                        <span th:if="${c.status == 'APPROVED'}" style="color:green;">Approved</span>
+                        <span th:if="${c.status == 'REJECTED'}" style="color:red;">Rejected</span>
+                        <span th:if="${c.status == 'IN_PROGRESS'}" style="color:blue;">In Progress</span>
+                    </td>
+
+                    <td th:text="${#temporals.format(c.createdAt, 'dd-MM-yyyy')}"></td>
+
+                    <!-- 🔥 ACTION BUTTONS -->
+					<td class="action-btns">
+
+					    <!-- ✅ SHOW FOR PENDING + IN_PROGRESS -->
+					    <th:block th:if="${c.status == 'PENDING' or c.status == 'IN_PROGRESS'}">
+
+					        <a th:href="@{/admin/update-status(id=${c.id}, status='APPROVED')}" 
+					           class="btn approve">Approve</a>
+
+					        <button type="button"
+					                th:attr="onclick=|openRejectPopup(${c.id})|"
+					                class="btn reject">
+					            Reject
+					        </button>
+
+					        <a th:href="@{/admin/update-status(id=${c.id}, status='IN_PROGRESS')}" 
+					           class="btn progress">Progress</a>
+
+					    </th:block>
+
+					    <!-- ❌ HIDE AFTER FINAL -->
+					    <span th:if="${c.status == 'APPROVED' or c.status == 'REJECTED'}" style="color: gray;">
+					        Action Taken
+					    </span>
+
+					</td>
+                </tr>
+				
+				
+            </tbody>
+
+        </table>
+    </div>
+	<div id="rejectModal" class="modal">
+					    <div class="modal-content">
+					        <h3>Reject Complaint</h3>
+
+					        <textarea id="rejectReason" placeholder="Enter reason..." required></textarea>
+
+					        <input type="hidden" id="complaintId">
+
+							<div class="modal-buttons">
+							    <button class="submit-btn" onclick="submitReject()">Submit</button>
+							    <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+							</div>
+					    </div>
+					</div>
+
+</div>
+
+</body>
+<script>
+function openRejectPopup(id) {
+    document.getElementById("rejectModal").style.display = "block";
+    document.getElementById("complaintId").value = id;
+}
+
+function closeModal() {
+    document.getElementById("rejectModal").style.display = "none";
+}
+
+function submitReject() {
+    let id = document.getElementById("complaintId").value;
+    let reason = document.getElementById("rejectReason").value;
+
+    if (reason.trim() === "") {
+        alert("Reason is required!");
+        return;
+    }
+
+    window.location.href = `/admin/reject?id=${id}&reason=${encodeURIComponent(reason)}`;
+}
+</script>
+</html>

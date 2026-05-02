@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Raise Complaint</title>
+<link rel="stylesheet" href="/css/complaints.css">
+</head>
+<body>
+
+<div class="form-container">
+
+    <div class="form-card">
+
+        <!-- ❌ Close Button -->
+        <div class="close-btn">
+            <a th:href="@{/student/dashboard}">✖</a>
+        </div>
+
+        <!-- Heading -->
+        <h2 th:text="${complaint != null} ? '✏️ Edit Complaint' : '📝 Raise a Complaint'"></h2>
+        <p class="subtitle">Tell us your issue clearly</p>
+
+        <!-- 🔥 TYPE SELECT (WORKS FOR BOTH NEW + EDIT) -->
+        <form action="/complaints" method="get">
+
+            <!-- preserve editId if editing -->
+            <input type="hidden" name="editId" th:value="${complaint != null ? complaint.id : ''}">
+
+            <select name="type" onchange="this.form.submit()" required>
+
+                <option value="">Select Complaint Type</option>
+
+                <option value="academic"
+                    th:selected="${selectedType == 'academic' || (complaint != null && complaint.type == 'academic')}">
+                    Academic
+                </option>
+
+                <option value="infrastructure"
+                    th:selected="${selectedType == 'infrastructure' || (complaint != null && complaint.type == 'infrastructure')}">
+                    Infrastructure
+                </option>
+
+                <option value="hostel"
+                    th:selected="${selectedType == 'hostel' || (complaint != null && complaint.type == 'hostel')}">
+                    Hostel
+                </option>
+
+                <option value="fees"
+                    th:selected="${selectedType == 'fees' || (complaint != null && complaint.type == 'fees')}">
+                    Fees
+                </option>
+
+                <option value="technical"
+                    th:selected="${selectedType == 'technical' || (complaint != null && complaint.type == 'technical')}">
+                    Technical
+                </option>
+
+                <option value="ragging"
+                    th:selected="${selectedType == 'ragging' || (complaint != null && complaint.type == 'ragging')}">
+                    Ragging
+                </option>
+
+                <option value="other"
+                    th:selected="${selectedType == 'other' || (complaint != null && complaint.type == 'other')}">
+                    Other
+                </option>
+
+            </select>
+
+        </form>
+
+        <!-- 🔥 MAIN FORM -->
+        <form th:action="${complaint != null} ? @{'/update/' + ${complaint.id}} : @{/complaints}"
+              method="post">
+
+            <!-- hidden id -->
+            <input type="hidden" name="id"
+                   th:value="${complaint != null ? complaint.id : ''}">
+
+            <!-- hidden type -->
+            <input type="hidden" name="type"
+                   th:value="${complaint != null ? complaint.type : selectedType}">
+
+            <!-- TITLE -->
+            <input type="text" name="title"
+                   th:value="${complaint != null ? complaint.title : ''}"
+                   placeholder="Complaint Title" required>
+
+            <!-- SUB TYPE -->
+            <select name="subType" required>
+                <option value="">Select Sub Type</option>
+
+                <option th:each="s : ${subTypes}"
+                        th:value="${s}"
+                        th:text="${s}"
+                        th:selected="${complaint != null && complaint.subType == s}">
+                </option>
+            </select>
+
+            <!-- DESCRIPTION -->
+            <textarea name="description" required placeholder="Complaint description..."
+                      th:text="${complaint != null ? complaint.description : ''}">
+            </textarea>
+
+            <!-- BUTTON -->
+            <button type="submit"
+                th:text="${complaint != null} ? 'Update Complaint' : 'Submit Complaint'">
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

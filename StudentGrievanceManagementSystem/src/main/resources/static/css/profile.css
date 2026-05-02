@@ -1,0 +1,90 @@
+/* ================= PROFILE PAGE ================= */
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #fff7ed, #f0f9ff);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* CARD */
+.profile-container {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    width: 350px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+/* TITLE */
+.profile-container h2 {
+    margin-bottom: 20px;
+    color: #1e293b;
+}
+
+/* INPUTS */
+.profile-container input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.profile-container input:focus {
+    border-color: #6366f1;
+    outline: none;
+    box-shadow: 0 0 5px rgba(99,102,241,0.3);
+}
+
+/* LABEL */
+.profile-container label {
+    display: block;
+    text-align: left;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #475569;
+}
+
+/* BUTTON */
+.profile-container button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.profile-container button:hover {
+    transform: scale(1.05);
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+}
+
+/* DISABLED INPUT */
+.profile-container input[disabled] {
+    background: #f1f5f9;
+    cursor: not-allowed;
+}
+
+/* BACK BUTTON (optional) */
+.back-btn {
+    margin-top: 10px;
+    display: inline-block;
+    text-decoration: none;
+    color: #6366f1;
+    font-size: 14px;
+}
+
+.back-btn:hover {
+    text-decoration: underline;
+}

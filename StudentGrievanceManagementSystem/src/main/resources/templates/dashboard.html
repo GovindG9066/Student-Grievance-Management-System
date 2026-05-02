@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>SGMS Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/dashboard.css">
+
+</head>
+
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <h2>🌈 SGMS</h2>
+
+    <div class="nav-right">
+        <span th:text="'Hi, ' + ${user.name} + ' 👋'"></span>
+
+        <div class="profile-menu">
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="avatar">
+
+            <div class="dropdown">
+                <p><b th:text="${user.name}"></b></p>
+                <p th:text="${user.email}"></p>
+
+                <a th:href="@{/profile}">
+                    <button>Edit Profile</button>
+                </a>
+                <a th:href="@{/logout}">
+                    <button>Logout</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+
+    <!-- CARDS -->
+    <div class="cards">
+        <div class="card active" onclick="filterComplaints('ALL')">
+            <h3 th:text="${#lists.size(complaints)}"></h3>
+            <p>Total Complaints</p>
+        </div>
+
+        <div class="card pending" onclick="filterComplaints('PENDING')">
+            <h3 th:text="${#lists.size(complaints.?[#strings.equalsIgnoreCase(status,'PENDING')])}"></h3>
+            <p>Pending</p>
+        </div>
+
+        <div class="card resolved" onclick="filterComplaints('APPROVED')">
+            <h3 th:text="${#lists.size(complaints.?[#strings.equalsIgnoreCase(status,'APPROVED')])}"></h3>
+            <p>Resolved</p>
+        </div>
+
+        <div class="card rejected" onclick="filterComplaints('REJECTED')">
+            <h3 th:text="${#lists.size(complaints.?[#strings.equalsIgnoreCase(status,'REJECTED')])}"></h3>
+            <p>Rejected</p>
+        </div>
+    </div>
+
+    <!-- Banner -->
+    <a th:href="@{/complaints}" class="awareness-banner">
+        <div class="overlay">
+            <h3>🚫 Say No to Ragging</h3>
+            <p>If you face any issue, report immediately.</p>
+            <p>Click here to file a complaint</p>
+        </div>
+    </a>
+
+    <!-- Button -->
+    <div class="add-btn">
+        <a th:href="@{/complaints}" class="btn">+ New Complaint</a>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-section">
+        <h3>My Complaints</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr th:if="${#lists.isEmpty(complaints)}">
+                    <td colspan="6">No complaints found 😕</td>
+                </tr>
+
+                <!-- 🔥 FIXED ROW -->
+                <tr th:each="c, i : ${complaints}"
+                    th:attr="data-status=${c.status}, data-reason=${c.rejectReason}"
+                    onclick="selectComplaint(this)">
+
+                    <td th:text="${i.index + 1}"></td>
+                    <td th:text="${c.title}"></td>
+                    <td th:text="${c.type}"></td>
+
+                    <td th:text="${c.status}"
+                        th:class="'status ' + ${c.status.toLowerCase()}">
+                    </td>
+
+                    <td th:text="${#temporals.format(c.createdAt, 'yyyy-MM-dd')}"></td>
+
+                    <td>
+                        <a th:if="${#strings.equalsIgnoreCase(c.status,'PENDING')}"
+                           th:href="@{'/edit/' + ${c.id}}">
+                            <button class="edit-btn">Edit</button>
+                        </a>
+
+                        <a th:if="${#strings.equalsIgnoreCase(c.status,'PENDING')}"
+                           th:href="@{'/delete/' + ${c.id}}">
+                            <button class="delete-btn">Delete</button>
+                        </a>
+
+                        <span th:if="${!#strings.equalsIgnoreCase(c.status,'PENDING')}">—</span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="progress-container">
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="status-text">
+            <span id="stepPending">Pending</span>
+            <span id="stepProgress">In Progress</span>
+            <span id="stepResolved">Resolved</span>
+            <span id="stepRejected">Rejected</span>
+        </div>
+
+        <!-- 🔥 REJECT BOX -->
+        <div id="rejectBox" style="display:none; margin-top:15px;">
+            <div style="background:#f8d7da; padding:10px; border-radius:8px;">
+                <b style="color:#dc3545;">❌ Rejected Reason:</b>
+                <p id="rejectReasonText"></p>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+// FILTER
+function filterComplaints(status) {
+
+    let rows = document.querySelectorAll("tbody tr");
+
+    rows.forEach(row => {
+        let rowStatus = row.getAttribute("data-status");
+
+        if (status === "ALL" || rowStatus === status) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
+}
+
+// SELECT
+function selectComplaint(row) {
+
+    document.querySelectorAll("tbody tr").forEach(r => {
+        r.classList.remove("selected-row");
+    });
+
+    row.classList.add("selected-row");
+
+    let status = row.getAttribute("data-status");
+    let reason = row.getAttribute("data-reason");
+
+    let progress = document.getElementById("progressFill");
+	progress.style.background = "linear-gradient(to right, orange, green)";
+
+    document.getElementById("rejectBox").style.display = "none";
+
+    document.querySelectorAll(".status-text span").forEach(s => s.classList.remove("active-step"));
+
+    if (status === "PENDING") {
+        progress.style.width = "33%";
+        stepPending.classList.add("active-step");
+    } 
+    else if (status === "IN_PROGRESS") {
+        progress.style.width = "66%";
+        stepProgress.classList.add("active-step");
+    } 
+    else if (status === "APPROVED") {
+        progress.style.width = "100%";
+        stepResolved.classList.add("active-step");
+    } 
+    else if (status === "REJECTED") {
+        progress.style.width = "100%";
+        progress.style.background = "#dc3545";
+        stepRejected.classList.add("active-step");
+
+        document.getElementById("rejectBox").style.display = "block";
+        document.getElementById("rejectReasonText").innerText =
+            reason ? reason : "No reason provided";
+    }
+}
+
+</script>
+
+</body>
+</html>
